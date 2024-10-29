@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Probing Question Assistant</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        #response,
+        #question {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>AI for Teaching</h1>
+    <p>Enter a topic or prompt, and the AI ask a question to test your knowledge on that topic:</p>
+
+    <form id="aiForm">
+        <label for="prompt">Enter your prompt:</label><br><br>
+        <textarea id="prompt" name="prompt" rows="5" cols="50" placeholder="Enter a topic or prompt..."></textarea>
+        <br><br>
+        <input type="submit" value="Submit">
+    </form>
+
+    <div id="response"></div>
+    <div id="question"></div>
+
+    <script>
+        document.getElementById('aiForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const prompt = document.getElementById('prompt').value;
+            const responseDiv = document.getElementById('response');
+            const questionDiv = document.getElementById('question');
+
+            // Clear previous response
+            responseDiv.innerHTML = 'Generating response...';
+            questionDiv.innerHTML = '';
+
+            try {
+                // Send the prompt to the backend via POST
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ prompt: prompt })
+                });
+
+                const data = await response.json();
+
+                // Display the AI response
+                responseDiv.innerHTML = `<strong>AI Response:</strong> ${data.response}`;
+
+                if (data.question) {
+                    questionDiv.innerHTML = `<strong>Generated Question:</strong> ${data.question}`;
+                } else {
+                    questionDiv.innerHTML = '<strong>No question generated.</strong>';
+                }
+
+            } catch (error) {
+                responseDiv.innerHTML = 'An error occurred. Please try again.';
+            }
+        });
+    </script>
+
+</body>
+
+</html>
